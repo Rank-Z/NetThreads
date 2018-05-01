@@ -1,7 +1,6 @@
 #ifndef NETTHREADS_REACTOR_HPP
 #define NETTHREADS_REACTOR_HPP
 
-
 #include<map>
 #include"Epoll.hpp"
 #include"Event.hpp"
@@ -11,7 +10,7 @@ namespace netthreads
 {
 
 template<typename Multiplex>
-class Reactor : public noncopyable
+class Reactor : public help::noncopyable
 {
 public:
 
@@ -48,12 +47,12 @@ Reactor<Multiplex>::Reactor(int size)
 template<typename Multiplex>
 Reactor<Multiplex>::~Reactor()
 {
-
+	// TODO 
 }
 
 
 template<typename Multiplex>
-void Reactor<Multiplex>::loop()
+inline void Reactor<Multiplex>::loop()
 {
 	while (!stop_)
 	{
@@ -66,38 +65,38 @@ void Reactor<Multiplex>::loop()
 }
 
 template<typename Multiplex>
-bool Reactor<Multiplex>::add_event(Event& event)
+inline bool Reactor<Multiplex>::add_event(Event& event)
 {
 	return poller_.update_event(event);
 }
 
 template<typename Multiplex>
-bool Reactor<Multiplex>::change_event(Event& event)
+inline bool Reactor<Multiplex>::change_event(Event& event)
 {
 	return poller_.update_event(event);
 }
 
 template<typename Multiplex>
-bool Reactor<Multiplex>::del_event(Event& event)
+inline bool Reactor<Multiplex>::del_event(Event& event)
 {
 	return poller_.del_event(event);
 }
 
 template<typename Multiplex>
-bool Reactor<Multiplex>::del_fd(int fd)
+inline bool Reactor<Multiplex>::del_fd(int fd)
 {
 	return poller_.del_event(fd);
 }
 
 
 template<typename Multiplex>
-void Reactor<Multiplex>::stop()
+inline void Reactor<Multiplex>::stop()
 {
 	stop_=true;
 }
 
 template<typename Multiplex>
-void Reactor<Multiplex>::nostop()
+inline void Reactor<Multiplex>::nostop()
 {
 	stop_=false;
 }

@@ -1,6 +1,8 @@
 #ifndef NETTHREADS_EVENT_HPP
 #define NETTHREADS_EVENT_HPP
 
+#include"name.h"
+
 namespace netthreads
 {
 
@@ -16,7 +18,6 @@ enum EventType
 	TIME
 };
 
-using Callback=void(*)(int fd);
 
 class Event
 {
@@ -38,7 +39,7 @@ public:
 	Event(const Event& right)
 		:fd_(right.get_fd()),
 		events_(right.get_events()),
-		revents_(right.get_revents()), // FIXME: 这里把已发生事件集也copy，目的是让用户可以手动触发callback
+		revents_(right.get_revents()), // FIXME?: 这里把已发生事件集也copy，目的是让用户可以手动触发callback
 		readcb_(right.readcb_),
 		writecb_(right.writecb_),
 		errorcb_(right.errorcb_)
@@ -47,7 +48,7 @@ public:
 	Event& operator=(const Event& right)
 	{
 		events_=right.get_events();
-		revents_=right.get_revents(); // FIXME: 理由同copy ctor
+		revents_=right.get_revents(); // FIXME?: 理由同copy ctor
 		// 这里不copy 回调函数，考虑到很多情况下只是更新目标事件集，减轻用户代码负担
 	}
 
@@ -143,6 +144,11 @@ private:
 	Callback writecb_;
 	Callback errorcb_;
 };
+
+
+
+
+
 
 } // namespace netthreads
 
