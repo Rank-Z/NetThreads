@@ -26,7 +26,7 @@ bool Epoll::update_event(Event& event)
 
 		if (ctl_ret==-1) // TODO
 		{
-
+			// should rollback and return false
 		}
 	}
 	else

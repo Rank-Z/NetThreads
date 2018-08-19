@@ -1,7 +1,7 @@
 #ifndef NETTHREADS_EVENT_HPP
 #define NETTHREADS_EVENT_HPP
 
-#include"name.h"
+#include"NT_name.h"
 
 namespace netthreads
 {
@@ -50,6 +50,7 @@ public:
 		events_=right.get_events();
 		revents_=right.get_revents(); // FIXME?: 理由同copy ctor
 		// 这里不copy 回调函数，考虑到很多情况下只是更新目标事件集，减轻用户代码负担
+		return *this;
 	}
 
 	int get_fd() const

@@ -4,7 +4,9 @@
 #include<map>
 #include"Epoll.hpp"
 #include"Event.hpp"
-#include"helper.hpp"
+#include"Timer.h"
+#include"TimerHeap.hpp"
+#include"NT_helper.hpp"
 
 namespace netthreads
 {
@@ -32,10 +34,23 @@ public:
 
 	bool del_fd(int fd);
 
+	TimerHandle addtimer_at(TimeData,Callback);
+
+	TimerHandle addtimer_after(TimeData, Callback);
+
+	TimerHandle addtimer_after(time_t, long, Callback);
+
+	TimerHandle addtimer_every(TimeData, Callback); 
+
+	TimerHandle addtimer_every(time_t, long, Callback);
+
+	bool cancel_timer(TimerHandle);
+
 private:
 	std::map<int, Event> events_map_;
 	Multiplex poller_;
 	bool stop_;
+	TimerHeap timerheap_;
 };
 
 template<typename Multiplex>
@@ -100,6 +115,81 @@ inline void Reactor<Multiplex>::nostop()
 {
 	stop_=false;
 }
+
+
+
+template<typename Multiplex>
+TimerHandle Reactor<Multiplex>::addtimer_at(TimeData timedata, Callback cb)
+{
+	TimerType type=At;
+	auto s_ptr=std::make_shared<Timer>(timedata, cb,type);
+	timerheap_.addtimer(s_ptr);
+	TimerHandle w_ptr=s_ptr;
+	
+	return w_ptr;
+}
+
+template<typename Multiplex>
+TimerHandle Reactor<Multiplex>::addtimer_after(TimeData interval, Callback cb)
+{
+	TimerType type=After;
+
+	std::shared_ptr<Timer> s_ptr(new Timer(interval,cb,type));
+	timerheap_.addtimer(s_ptr);
+	TimerHandle w_ptr=s_ptr;
+
+	return w_ptr;
+}
+
+template<typename Multiplex>
+TimerHandle Reactor<Multiplex>::addtimer_after(time_t seconds,long nanoseconds, Callback cb)
+{
+	TimerType type=After;
+	std::shared_ptr<Timer> s_ptr(new Timer(seconds,nanoseconds, cb, type));
+	timerheap_.addtimer(s_ptr);
+	TimerHandle w_ptr=s_ptr;
+
+	return w_ptr;
+}
+
+template<typename Multiplex>
+TimerHandle Reactor<Multiplex>::addtimer_every(TimeData interval, Callback cb)
+{
+	TimerType type=Every;
+	std::shared_ptr<Timer> s_ptr(new Timer(interval, cb, type));
+
+	timerheap_.addtimer(s_ptr);
+	TimerHandle w_ptr=s_ptr;
+
+	return w_ptr;
+}
+
+template<typename Multiplex>
+TimerHandle Reactor<Multiplex>::addtimer_every(time_t seconds, long nanoseconds, Callback cb)
+{
+	TimerType type=Every;
+	std::shared_ptr<Timer> s_ptr(new Timer(seconds, nanoseconds, cb, type));
+
+	timerheap_.addtimer(s_ptr);
+	TimerHandle w_ptr=s_ptr;
+
+	return w_ptr;
+}
+
+template<typename Multiplex>
+bool Reactor<Multiplex>::cancel_timer(TimerHandle w_ptr)
+{
+	std::shared_ptr<Timer> s_ptr=w_ptr.lock();
+	if (s_ptr)
+	{
+		(*s_ptr).cancel();
+
+		return true;
+	}
+	else
+		return false;
+}
+
 
 } // namespace netthreads
 
